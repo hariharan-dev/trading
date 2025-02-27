@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "trading"
+version = "0.1.0"
+description = ""
+authors = ["Hariharan Devaraj <hariharan_devaraj@Hariharans-MacBook-Pro.local>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+yfinance = "^0.2.54"
+pandas = "^2.2.3"
+streamlit = "^1.42.2"
+plotly = "^6.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
