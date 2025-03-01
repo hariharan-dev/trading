@@ -1,5 +1,5 @@
+import json
 from datetime import datetime, timedelta
-from pathlib import Path
 
 import pandas as pd
 import yfinance as yf
@@ -85,22 +85,56 @@ def get_stocks(file_name):
     return df["Symbol"].tolist()
 
 
+def get_stocks_from_json(index_name):
+    """
+    Get a list of stock symbols from the nifty_indices.json file.
+
+    Args:
+        index_name (str): Name of the index to get stocks for
+
+    Returns:
+        list: List of stock symbols
+    """
+    try:
+        with open("data/nifty_indices.json", "r") as f:
+            indices_data = json.load(f)
+
+        if index_name.lower() in indices_data:
+            return indices_data[index_name.lower()]
+        else:
+            print(f"Index {index_name} not found in nifty_indices.json")
+            return []
+    except Exception as e:
+        print(f"Error loading nifty_indices.json: {str(e)}")
+        return []
+
+
 def main():
-    top = 100
-    tickers = get_stocks(f"ind_nifty{top}list.csv")
-    # tickers = ["SHRIRAMFIN"]
+    # Load available indices
+    try:
+        with open("data/nifty_indices.json", "r") as f:
+            indices_data = json.load(f)
+
+        # Use nifty100 by default
+        index_name = "nifty100"
+        tickers = indices_data.get(index_name, [])
+    except Exception as e:
+        print(f"Error loading indices: {str(e)}")
+        # Fallback to nifty100 CSV if JSON fails
+        tickers = get_stocks("ind_nifty100list.csv")
+
     surge_results = []
 
     for ticker in tickers:
-        ticker = ticker + ".NS"
+        ticker_ns = ticker + ".NS"
         is_surge, current_volume, avg_volume, previous_volumes, percent_increase = (
-            check_volume_surge(ticker)
+            check_volume_surge(ticker_ns)
         )
 
         if is_surge and percent_increase > 49:
             surge_results.append(
                 {
-                    "ticker": ticker,
+                    "ticker": ticker_ns,
                     "percent_increase": percent_increase,
                     "current_volume": current_volume,
                     "avg_volume": avg_volume,
